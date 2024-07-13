@@ -1,11 +1,17 @@
 const express = require('express')
+const bodyParser = require('body-parser');
+const authRoutes = require('./routes/auth');
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => {
-  res.send('Hello Hina Yasir !')
-})
+//app.use(express.json())
+// Middleware
+app.use(bodyParser.json());
+
+// Routes
+app.use('/signin', authRoutes);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Auth Server listening on port ${port}`)
 })
+
