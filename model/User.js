@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const util = require('util');
-
+const generateOTP = require('../controller/otp')
 
 const pool = mysql.createPool({
   connectionLimit: 2,
@@ -49,18 +49,21 @@ const createUser = async (name,email, password) => {
     const emailUser = await checkEmailExists(email);
     if (emailUser) {
       console.log("User Exists", emailUser);
-      //throw new Error('Email already exists'); // Throw an error if email already exists
       return { message: "userExists" };
     }
-    //console.log("Type of password",typeof password);
+    
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     // Insert the new user into the database
     const insertQuery = 'INSERT INTO user (name,email, password) VALUES (?,?, ?)';
     const result = await pool.query(insertQuery, [name, email, hashedPassword]);
 
+    //Generate OTP here
+    const otp = await generateOTP();
+
+
     // Return the inserted user
-    return { id: result.insertId,name, email };
+    return { id: result.insertId,name, email,otp };
   
   } catch (error) {
     console.log("Some error here in DB",error);
