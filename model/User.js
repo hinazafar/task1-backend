@@ -51,6 +51,18 @@ async function checkHash(userPassword, hashPassword) {
   else
     return false;
 }
+// Generate Hashed Password
+async function hashPassword(password) {
+  try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Store hashedPassword in your password DB
+      return hashedPassword;
+  } catch (err) {
+      console.error('Error hashing password:', err);
+      throw err; // Or handle the error as appropriate
+  }
+}
+
 // Function to create a new user
 const createUser = async (name,email, password) => {
   try {
@@ -67,12 +79,15 @@ const createUser = async (name,email, password) => {
     //       console.log("salt=",salt);
     //       const hashedPassword = await bcrypt.hash(password, salt);
 
-    const hashedPassword='';
-    await bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
-      // Store hash in your password DB.
-      hashedPassword = hash;
-  });
+  //   let hashedPassword='';
+  //   await bcrypt.hash(password, 10, function(err, hash) {
+  //     // Store hash in your password DB.
+  //     hashedPassword = hash;
+  // });
     //const hashedPassword = await bcrypt.hash(password, 10);
+
+    const hashedPassword = await hashPassword(password);
+    console.log("Hashed Passowrd Generated",hashedPassword);
     // Insert the new user into the database
     const insertQuery = 'INSERT INTO user (name,email, password) VALUES (?,?, ?)';
     const result = await pool.query(insertQuery, [name, email, hashedPassword]);
@@ -80,7 +95,7 @@ const createUser = async (name,email, password) => {
     //Generate OTP here
     const otp = await generateOTP();
     // send otp to user Email
-    sendOTPEmail(email,otp)
+    //sendOTPEmail(email,otp)
 
     // Return the inserted user
     return { id: result.insertId,name, email,otp };
