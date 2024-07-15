@@ -14,11 +14,8 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-async function sendOTPEmail(email) {
-    try {
-        // Generate OTP
-        const otp = await generateOTP();
-        console.log("otp received in mail function=",otp);       
+async function sendOTPEmail(email,otp) {
+    try {         
 
         // Email content
         const mailOptions = {
