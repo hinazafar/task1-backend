@@ -73,19 +73,6 @@ const createUser = async (name,email, password) => {
       console.log("User Exists", emailUser);
       return { message: "userExists" };
     }
-    
-    // Hash the password
-    // const salt = await bcrypt.genSalt(10);
-    //       console.log("salt=",salt);
-    //       const hashedPassword = await bcrypt.hash(password, salt);
-
-  //   let hashedPassword='';
-  //   await bcrypt.hash(password, 10, function(err, hash) {
-  //     // Store hash in your password DB.
-  //     hashedPassword = hash;
-  // });
-    //const hashedPassword = await bcrypt.hash(password, 10);
-
     const hashedPassword = await hashPassword(password);
     console.log("Hashed Passowrd Generated",hashedPassword);
     // Insert the new user into the database
@@ -95,7 +82,7 @@ const createUser = async (name,email, password) => {
     //Generate OTP here
     const otp = await generateOTP();
     // send otp to user Email
-    //sendOTPEmail(email,otp)
+    sendOTPEmail(email,otp)
 
     // Return the inserted user
     return { id: result.insertId,name, email,otp };

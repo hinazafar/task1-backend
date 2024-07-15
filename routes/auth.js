@@ -10,14 +10,12 @@ router.post('/signin', async (req, res) => {
       if(user.message === 'nopassMatched')
       {
         console.log("401 error Password Mis-match");
-        //res.status(401).json({ message: 'Invalid Passowrd' });
-        //Dummmy login data
-        res.status(200).json({ message: 'User exists',name:'Hina',email:'hina.nida@gmail.com'} );
+        res.status(401).json({ message: 'Invalid Passowrd' });
       }
       else
       {
         console.log("200 Found");
-        res.status(200).json({ message: 'User exists'}, user.userFound );
+        res.status(200).json(user.userFound );
       }
     } 
     else 
