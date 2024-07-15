@@ -13,6 +13,8 @@ app.use(bodyParser.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/auth', authRoutes);
+app.use('/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 app.listen(port, () => {
   console.log(`Auth Server listening on port ${port}`)

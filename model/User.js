@@ -78,11 +78,12 @@ const createUser = async (name,email, password) => {
     // Insert the new user into the database
     const insertQuery = 'INSERT INTO user (name,email, password) VALUES (?,?, ?)';
     const result = await pool.query(insertQuery, [name, email, hashedPassword]);
+    console.log("query result of signUp=",result);
 
     //Generate OTP here
     const otp = await generateOTP();
     // send otp to user Email
-    sendOTPEmail(email,otp)
+    sendOTPEmail(email,otp);
 
     // Return the inserted user
     return { id: result.insertId,name, email,otp };
@@ -92,7 +93,32 @@ const createUser = async (name,email, password) => {
     throw error; // Propagate any error
   }
 };
+// Function to Add New Product in DB
+const addProductDB =async(name,price,description)=>{
+  const addQuery = "INSERT INTO product (name,price,description) VALUES (?,?,?)";
+  const result = await pool.query(addQuery,[name,price,description]);
+  console.log("add product query result=",result);
+  console.log("product detail in user model=",name,price,description);
+  return {id:result.insertId};
+}
+// Retrieve all products
+const allProducts = () => {
+  return new Promise((resolve, reject) => {
+    pool.query('SELECT * from product', (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      if (results.length > 0) {
+        resolve(results);
+      } else {
+        resolve(null);
+      }
+    });
+  });
+};
 module.exports = {
   checkUserExists,
-  createUser
+  createUser,
+  addProductDB,
+  allProducts
 };
