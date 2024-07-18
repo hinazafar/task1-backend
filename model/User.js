@@ -2,8 +2,9 @@ const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
+var jwt = require('jsonwebtoken');
 
-const pool = mysql.createPool({
+const pool = mysql.createPool({       
   connectionLimit: 2,
   host     : 'localhost',
   user     : 'hina',
@@ -69,15 +70,20 @@ const createUser = async (name,email, password) => {
     // Check if the email already exists
     console.log("Email Recived",email);
     const emailUser = await checkEmailExists(email);
-    if (emailUser) {
+    console.log("after email checking",emailUser)
+    if (emailUser) 
+      {
       console.log("User Exists", emailUser);
       return { message: "userExists" };
     }
+    const data = {user:{email:email}};
+    const token = await jwt.sign(data,process.env.JWT_SECRET);
+    console.log("sign up token",token);
     const hashedPassword = await hashPassword(password);
     console.log("Hashed Passowrd Generated",hashedPassword);
     // Insert the new user into the database
-    const insertQuery = 'INSERT INTO user (name,email, password) VALUES (?,?, ?)';
-    const result = await pool.query(insertQuery, [name, email, hashedPassword]);
+    const insertQuery = 'INSERT INTO user (name,email, password,token) VALUES (?,?,?,?)';
+    const result = await pool.query(insertQuery, [name, email, hashedPassword,token]);
     console.log("query result of signUp=",result);
 
     //Generate OTP here
@@ -86,7 +92,7 @@ const createUser = async (name,email, password) => {
     sendOTPEmail(email,otp);
 
     // Return the inserted user
-    return { id: result.insertId,name, email,otp };
+    return { id: result.insertId,name, email,otp,token };
   
   } catch (error) {
     console.log("Some error here in DB",error);
@@ -104,7 +110,7 @@ const addProductDB =async(name,price,description)=>{
 // Retrieve all products
 const allProducts = () => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * from product', (error, results) => {
+    pool.query('SELECT * from product ORDER BY id DESC', (error, results) => {
       if (error) {
         return reject(error);
       }
@@ -120,5 +126,6 @@ module.exports = {
   checkUserExists,
   createUser,
   addProductDB,
-  allProducts
+  allProducts,
+  checkEmailExists
 };

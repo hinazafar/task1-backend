@@ -1,8 +1,11 @@
 const express = require('express');
-const { checkUserExists, createUser,addProductDB, allProducts } = require('../model/User');
+const { checkUserExists, createUser,addProductDB, allProducts, checkEmailExists } = require('../model/User');
 const router = express.Router();
+var jwt = require('jsonwebtoken');
+const generateOTP = require('../controller/otp');
+const sendOTPEmail = require('../controller/sendEmail');
 
-//Sign-in route
+//Route 01: Sign-in route
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -15,9 +18,39 @@ router.post('/signin', async (req, res) => {
       }
       else
       {
+        const data = {user:{id:user.userFound.id}};
+        const authToken = jwt.sign(data,process.env.JWT_SECRET);
+        console.log("Token:",authToken);
+        const sendUser = Object.defineProperty(user.userFound, "token", {value:authToken});
         console.log("200 Found");
-        res.status(200).json(user.userFound );
+        res.status(200).json(sendUser );
       }
+    } 
+    else 
+    {
+      console.log("401 error Email Mismatch");
+      res.status(401).json({ message: 'Invalid Email' });
+    }
+  } 
+  catch (error) {
+    res.status(500).json({ message: 'Error checking user', error:error });
+  }
+});
+//Route-02: Forgot Password route
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  console.log("Received email:",email);
+  try {
+    const user = await checkEmailExists(email);
+    if (user) 
+    {
+      //Generate OTP here
+      const otp = await generateOTP();
+      // send otp to user Email
+      sendOTPEmail(email,otp);
+      console.log("Email Result:",user);
+      console.log("200 Found");
+      res.status(200).json({otp:otp,user} );
     } 
     else 
     {
@@ -39,8 +72,10 @@ router.post('/signup', async (req, res) => {
     if (user) {
       if(user.message === "userExists")
         res.status(401).json({ message: 'Duplicate user' });
-      else
-      res.status(200).json({ message: 'User Created', user });
+      else{
+        console.log("User created",user);
+        res.status(200).json(user);
+    }
     } 
   } catch (error) {
     res.status(500).json({ message: 'Error checking user'});
@@ -73,7 +108,7 @@ router.get('/products',async (req,res)=>{
     const list = await allProducts();
     if(list)
     {
-      console.log("list received",list);
+      //console.log("list received",list);
       res.status(200).json(list);
     }
     else
