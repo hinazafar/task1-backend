@@ -122,10 +122,27 @@ const allProducts = () => {
     });
   });
 };
+// Function to Reset Password
+const resetPassword = async (email, password) => {
+  try {
+    const hashedPassword = await hashPassword(password);
+    console.log("Hashed Passowrd Generated",hashedPassword);
+    const pass_query = 'UPDATE user SET password = ? WHERE email = ?';
+    const values = [hashedPassword, email];
+
+    results = await pool.query(pass_query, values);
+    console.log("result",results);
+    return results;
+  } catch (error) {
+    console.log("Some error here in DB",error);
+    throw error; // Propagate any error
+  }
+};
 module.exports = {
   checkUserExists,
   createUser,
   addProductDB,
   allProducts,
-  checkEmailExists
+  checkEmailExists,
+  resetPassword
 };

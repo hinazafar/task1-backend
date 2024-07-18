@@ -1,5 +1,5 @@
 const express = require('express');
-const { checkUserExists, createUser,addProductDB, allProducts, checkEmailExists } = require('../model/User');
+const { checkUserExists, createUser,addProductDB, allProducts, checkEmailExists,resetPassword } = require('../model/User');
 const router = express.Router();
 var jwt = require('jsonwebtoken');
 const generateOTP = require('../controller/otp');
@@ -56,6 +56,27 @@ router.post('/forgot-password', async (req, res) => {
     {
       console.log("401 error Email Mismatch");
       res.status(401).json({ message: 'Invalid Email' });
+    }
+  } 
+  catch (error) {
+    res.status(500).json({ message: 'Error checking user', error:error });
+  }
+});
+//Route-03: Reset Password route
+router.post('/reset-password', async (req, res) => {
+  const { email,password } = req.body;
+  console.log("Received email:",email);
+  try {
+    const user = await resetPassword(email,password);
+    if (user) 
+    {
+      console.log("200 Found");
+      res.status(200).json({message:"Updated Successfuly"} );
+    } 
+    else 
+    {
+      console.log("401 error Email Mismatch");
+      res.status(401).json({ message: 'Error: try again' });
     }
   } 
   catch (error) {
