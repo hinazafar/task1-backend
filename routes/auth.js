@@ -4,6 +4,7 @@ const router = express.Router();
 var jwt = require('jsonwebtoken');
 const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
+var fetchuser = require('../middleware/fetchuser');
 
 //Route 01: Sign-in route
 router.post('/signin', async (req, res) => {
@@ -104,7 +105,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Add Product route to add new Product
-router.post('/add-product', async (req, res) => {
+router.post('/add-product',fetchuser, async (req, res) => {
   try{
     const { name,price,description } = req.body;
     // const file = req.file;
@@ -138,4 +139,22 @@ router.get('/products',async (req,res)=>{
     res.status(500).json({ message: 'Error fetching products'});
   }
 });
+
+//Get Products List
+router.get('/test', fetchuser ,async (req,res)=>{
+  try{
+    const list = await allProducts();
+    if(list)
+    {
+      //console.log("list received",list);
+      res.status(200).json(list);
+    }
+    else
+      res.status(404).json({message:"No product found"});
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Error fetching products'});
+  }
+});
+
 module.exports = router;
