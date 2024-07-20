@@ -129,15 +129,33 @@ const resetPassword = async (email, password) => {
     console.log("Hashed Passowrd Generated",hashedPassword);
     const pass_query = 'UPDATE user SET password = ? WHERE email = ?';
     const values = [hashedPassword, email];
-
-    results = await pool.query(pass_query, values);
-    console.log("result",results);
+    
+    let results = await update(pass_query,values);
     return results;
   } catch (error) {
     console.log("Some error here in DB",error);
     throw error; // Propagate any error
   }
 };
+// Update function for any query
+const update=(query,values)=>{
+  
+  return new Promise((resolve,reject)=>{
+    pool.query(query, values,(err,result)=>{
+      if(err)
+      {
+          console.log("insert error=",err)
+          reject({msg:err});
+      }
+      else
+      { 
+          console.log("Data inserted=",result);
+          resolve(result);
+      }
+  });
+  })
+  
+}
 module.exports = {
   checkUserExists,
   createUser,

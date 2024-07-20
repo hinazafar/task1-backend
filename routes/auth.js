@@ -65,15 +65,29 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 //Route-03: Reset Password route
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password',[
+  body('email', 'Enter a valid email').isEmail(),
+  body('password', 'Password must contain lower,upper,number and symbols of lenght 8 characters').isStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  }),
+], async (req, res) => {
   const { email,password } = req.body;
-  console.log("Received email:",email);
+  // If there are errors in validation, return Bad request and the errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const user = await resetPassword(email,password);
-    if (user) 
+    console.log("affectedRows of update password=",user.affectedRows);
+    if (user.affectedRows==1) 
     {
       console.log("200 Found");
-      res.status(200).json({message:"Updated Successfuly"} );
+      res.status(200).json({message:"Password Updated Successfuly"} );
     } 
     else 
     {
@@ -82,7 +96,7 @@ router.post('/reset-password', async (req, res) => {
     }
   } 
   catch (error) {
-    res.status(500).json({ message: 'Error checking user', error:error });
+    res.status(500).json({ message: 'Error in password updating', error:error });
   }
 });
 // Sign Up route to create the new user
