@@ -125,7 +125,6 @@ router.post('/add-product', async (req, res) => {
 //Get Products List
 router.get('/products',async (req,res)=>{
   try{
-    console.log("step 1");
     const list = await allProducts();
     if(list)
     {

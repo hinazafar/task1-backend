@@ -72,7 +72,7 @@ const createUser = async (name,email, password) => {
     const emailUser = await checkEmailExists(email);
     console.log("after email checking",emailUser)
     if (emailUser) 
-      {
+    {
       console.log("User Exists", emailUser);
       return { message: "userExists" };
     }
