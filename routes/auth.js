@@ -5,6 +5,7 @@ var jwt = require('jsonwebtoken');
 const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
 var fetchuser = require('../middleware/fetchuser');
+const { body, validationResult } = require('express-validator');
 
 //Route 01: Sign-in route
 router.post('/signin', async (req, res) => {
@@ -85,11 +86,25 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 // Sign Up route to create the new user
-router.post('/signup', async (req, res) => {
+router.post('/signup',[
+  body('name', 'Enter a valid name').isLength({ min: 5 }),
+  body('email', 'Enter a valid email').isEmail(),
+  body('password', 'Password must be lower,upper,number and symbols of lenght 8 characters').isStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  }),
+], async (req, res) => {
   const { name,email, password } = req.body;
+  // If there are errors in validation, return Bad request and the errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  console.log(req.body);
-  try {
+    try {
     const user = await createUser(name,email, password);
     if (user) {
       if(user.message === "userExists")
