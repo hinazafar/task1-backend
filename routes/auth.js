@@ -1,13 +1,13 @@
 const express = require('express');
-const { checkUserExists, createUser,addProductDB, allProducts, checkEmailExists,resetPassword } = require('../model/User');
+const { checkUserExists, createUser,checkEmailExists,resetPassword } = require('../model/User');
+const {addProductDB, allProducts } = require('../model/Product');
 const router = express.Router();
 var jwt = require('jsonwebtoken');
 const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
 var fetchuser = require('../middleware/fetchuser');
 const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
-
+const cors = require('cors');
 //Route 01: Sign-in route
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
@@ -135,21 +135,22 @@ router.post('/signup',[
 });
 
 // Add Product route to add new Product
-router.post('/add-product',fetchuser, async (req, res) => {
+router.post('/add-product', async (req, res) => {
+
   try{
-    const { name,price,description } = req.body;
-    // const file = req.file;
-    // if (!file) 
-    // {
-    //   return res.status(400).send({ message: 'File is required' });
-    // }
-    // const filePath = file.path;
+    const file = req.files.file;
+    const { name,price,description} = req.body;
+    if (file === null) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    console.log("file uploaded",file);
     // Insert product details into the database
-    console.log("values of name, price,descrptin",name, price,description);
-    const result = await addProductDB(name,price,description);
+    console.log("values of name, price,descrptin",name, price,description,file.name);
+    const result = await addProductDB(name,price,description,file.data);
     res.status(200).json({message: 'Product Added Successfuly'});
   }
   catch (error) {
+    console.log("error:",error);
     res.status(500).json({ message: 'Error adding product'});
   }
 });
