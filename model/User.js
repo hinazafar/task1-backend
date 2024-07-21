@@ -123,22 +123,24 @@ const allProducts = () => {
   });
 };
 // Function to Reset Password
-const resetPassword = async (email, password) => {
-  try {
-    const hashedPassword = await hashPassword(password);
-    console.log("Hashed Passowrd Generated",hashedPassword);
-    const pass_query = 'UPDATE user SET password = ? WHERE email = ?';
-    const values = [hashedPassword, email];
+// const resetPassword1 = async (email, password) => {
+//   try {
     
-    let results = await update(pass_query,values);
-    return results;
-  } catch (error) {
-    console.log("Some error here in DB",error);
-    throw error; // Propagate any error
-  }
-};
-// Update function for any query
-const update=(query,values)=>{
+    
+    
+//     let results = await update(pass_query,values);
+//     return results;
+//   } catch (error) {
+//     console.log("Some error here in DB",error);
+//     throw error; // Propagate any error
+//   }
+// };
+// Function to Reset Password
+const resetPassword= async(email,password)=>{
+  const hashedPassword = await hashPassword(password);
+  console.log("Hashed Passowrd Generated",hashedPassword);
+  const query = 'UPDATE user SET password = ? WHERE email = ?';
+  const values = [hashedPassword, email];
   
   return new Promise((resolve,reject)=>{
     pool.query(query, values,(err,result)=>{

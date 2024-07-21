@@ -6,6 +6,7 @@ const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
 var fetchuser = require('../middleware/fetchuser');
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 //Route 01: Sign-in route
 router.post('/signin', async (req, res) => {
@@ -81,20 +82,20 @@ router.post('/reset-password',[
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  try {
-    const user = await resetPassword(email,password);
-    console.log("affectedRows of update password=",user.affectedRows);
-    if (user.affectedRows==1) 
-    {
-      console.log("200 Found");
-      res.status(200).json({message:"Password Updated Successfuly"} );
-    } 
-    else 
-    {
-      console.log("401 error Email Mismatch");
-      res.status(401).json({ message: 'Error: try again' });
-    }
-  } 
+  try {    
+        const user = await resetPassword(email,password);
+        console.log("affectedRows of update password=",user.affectedRows);
+        if (user.affectedRows==1) 
+        {
+          console.log("200 Found");
+          res.status(200).json({message:"Password Updated Successfuly"} );
+        } 
+        else 
+        {
+          console.log("401 error Email Mismatch");
+          res.status(401).json({ message: 'Error: try again' });
+        }
+      } 
   catch (error) {
     res.status(500).json({ message: 'Error in password updating', error:error });
   }
