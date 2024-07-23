@@ -135,7 +135,7 @@ router.post('/signup',[
 });
 
 // Add Product route to add new Product
-router.post('/add-product', async (req, res) => {
+router.post('/add-product',fetchuser, async (req, res) => {
 
   try{
     const file = req.files.file;
