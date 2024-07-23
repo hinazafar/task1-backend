@@ -4,13 +4,9 @@ const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
 var jwt = require('jsonwebtoken');
 
-const pool = mysql.createPool({       
-  connectionLimit: 2,
-  host     : 'localhost',
-  user     : 'hina',
-  password : 'hina',
-  database : 'hina_db'
-});
+const dbconnection = require('../dbconnection');
+const dbpool = dbconnection();
+
 const checkUserExists = async(email, password) => {
   const userFound = await checkEmailExists(email);
   if (!userFound) {
@@ -32,7 +28,7 @@ const checkUserExists = async(email, password) => {
 //Check Email Exists 
 const checkEmailExists = (email) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * from user WHERE email = ? ', [email], (error, results) => {
+    dbpool.query('SELECT * from user WHERE email = ? ', [email], (error, results) => {
       if (error) {
         return reject(error);
       }
@@ -83,7 +79,7 @@ const createUser = async (name,email, password) => {
     console.log("Hashed Passowrd Generated",hashedPassword);
     // Insert the new user into the database
     const insertQuery = 'INSERT INTO user (name,email, password,token) VALUES (?,?,?,?)';
-    const result = await pool.query(insertQuery, [name, email, hashedPassword,token]);
+    const result = await dbpool.query(insertQuery, [name, email, hashedPassword,token]);
     console.log("query result of signUp=",result);
 
     //Generate OTP here
@@ -99,49 +95,16 @@ const createUser = async (name,email, password) => {
     throw error; // Propagate any error
   }
 };
-// Function to Add New Product in DB
-const addProductDB =async(name,price,description)=>{
-  const addQuery = "INSERT INTO product (name,price,description) VALUES (?,?,?)";
-  const result = await pool.query(addQuery,[name,price,description]);
-  console.log("add product query result=",result);
-  console.log("product detail in user model=",name,price,description);
-  return {id:result.insertId};
-}
-// Retrieve all products
-const allProducts = () => {
-  return new Promise((resolve, reject) => {
-    pool.query('SELECT * from product ORDER BY id DESC', (error, results) => {
-      if (error) {
-        return reject(error);
-      }
-      if (results.length > 0) {
-        resolve(results);
-      } else {
-        resolve(null);
-      }
-    });
-  });
-};
+
 // Function to Reset Password
-const resetPassword = async (email, password) => {
-  try {
-    const hashedPassword = await hashPassword(password);
-    console.log("Hashed Passowrd Generated",hashedPassword);
-    const pass_query = 'UPDATE user SET password = ? WHERE email = ?';
-    const values = [hashedPassword, email];
-    
-    let results = await update(pass_query,values);
-    return results;
-  } catch (error) {
-    console.log("Some error here in DB",error);
-    throw error; // Propagate any error
-  }
-};
-// Update function for any query
-const update=(query,values)=>{
+const resetPassword= async(email,password)=>{
+  const hashedPassword = await hashPassword(password);
+  console.log("Hashed Passowrd Generated",hashedPassword);
+  const query = 'UPDATE user SET password = ? WHERE email = ?';
+  const values = [hashedPassword, email];
   
   return new Promise((resolve,reject)=>{
-    pool.query(query, values,(err,result)=>{
+    dbpool.query(query, values,(err,result)=>{
       if(err)
       {
           console.log("insert error=",err)
@@ -159,8 +122,6 @@ const update=(query,values)=>{
 module.exports = {
   checkUserExists,
   createUser,
-  addProductDB,
-  allProducts,
   checkEmailExists,
   resetPassword
 };

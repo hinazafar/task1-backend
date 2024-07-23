@@ -11,7 +11,7 @@ const fetchuser = (req, res, next) => {
     try {
         const data = jwt.verify(token, process.env.JWT_SECRET);
         req.user = data.user;
-        console.log("Fetchuser="+req.user);
+       // console.log("Fetchuser="+req.user);
         next();
     } catch (error) {
         console.log(error)
