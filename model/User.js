@@ -28,12 +28,15 @@ const checkUserExists = async(email, password) => {
 //Check Email Exists 
 const checkEmailExists = (email) => {
   return new Promise((resolve, reject) => {
-    dbpool.query('SELECT * from user WHERE email = ? ', [email], (error, results) => {
+    //dbpool.query('SELECT * from user WHERE email = ? ', [email], (error, results) => {
+    dbpool.query('call getUserByEmail(?)',[email],(error,results)=>{
+      console.log("procedure result",results);
       if (error) {
         return reject(error);
       }
-      if (results.length > 0) {
-        resolve(results[0]);
+      // The results structure in case of procedure is [[results[0]],{}]
+      if (results[0].length > 0) {
+        resolve(results[0][0]);
       } else {
         resolve(null);
       }
