@@ -36,7 +36,7 @@ router.post('/signin', async (req, res) => {
     }
   } 
   catch (error) {
-    res.status(500).json({ message: 'Error checking user', error:error });
+    res.status(500).json({ message: 'Internal server error', error:error });
   }
 });
 //Route-02: Forgot Password route
@@ -62,7 +62,7 @@ router.post('/forgot-password', async (req, res) => {
     }
   } 
   catch (error) {
-    res.status(500).json({ message: 'Error checking user', error:error });
+    res.status(500).json({ message: 'Internal server error', error:error });
   }
 });
 //Route-03: Reset Password route
@@ -84,8 +84,8 @@ router.post('/reset-password',[
   }
   try {    
         const user = await resetPassword(email,password);
-        console.log("affectedRows of update password=",user.affectedRows);
-        if (user.affectedRows==1) 
+        console.log("affectedRows of update password=",user);
+        if (user.affectedRows>0) 
         {
           console.log("200 Found");
           res.status(200).json({message:"Password Updated Successfuly"} );
@@ -130,7 +130,7 @@ router.post('/signup',[
     }
     } 
   } catch (error) {
-    res.status(500).json({ message: 'Error checking user'});
+    res.status(500).json({ message: 'Internal server error'});
   }
 });
 

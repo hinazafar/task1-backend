@@ -1,11 +1,12 @@
-const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const generateOTP = require('../controller/otp');
 const sendOTPEmail = require('../controller/sendEmail');
 var jwt = require('jsonwebtoken');
 
-const dbconnection = require('../dbconnection');
+const dbconnection = require('../db/db-config');
 const dbpool = dbconnection();
+
+// Function 'checkUserExists' verifies if the user exists
 
 const checkUserExists = async(email, password) => {
   const userFound = await checkEmailExists(email);
@@ -81,10 +82,21 @@ const createUser = async (name,email, password) => {
     const hashedPassword = await hashPassword(password);
     console.log("Hashed Passowrd Generated",hashedPassword);
     // Insert the new user into the database
-    const insertQuery = 'INSERT INTO user (name,email, password,token) VALUES (?,?,?,?)';
-    const result = await dbpool.query(insertQuery, [name, email, hashedPassword,token]);
-    console.log("query result of signUp=",result);
-
+    //const insertQuery = 'INSERT INTO user (name,email, password,token) VALUES (?,?,?,?)';
+      const result = await new Promise((resolve,reject)=>{
+        dbpool.query('call addUser(?,?,?,?)',[name,email,hashedPassword,token],(error,result)=>{
+          if(error){
+            return reject(error);
+          }
+          else{
+            //console.log("add product result=",result);
+            return resolve(result);
+          }
+        });
+    
+      })
+    //const result = await dbpool.query(insertQuery, [name, email, hashedPassword,token]);
+    console.log("query result of signUp affected Rows=",result.affectedRows);
     //Generate OTP here
     const otp = await generateOTP();
     // send otp to user Email
@@ -103,24 +115,20 @@ const createUser = async (name,email, password) => {
 const resetPassword= async(email,password)=>{
   const hashedPassword = await hashPassword(password);
   console.log("Hashed Passowrd Generated",hashedPassword);
-  const query = 'UPDATE user SET password = ? WHERE email = ?';
-  const values = [hashedPassword, email];
-  
-  return new Promise((resolve,reject)=>{
-    dbpool.query(query, values,(err,result)=>{
-      if(err)
-      {
-          console.log("insert error=",err)
-          reject({msg:err});
+  const result = await new Promise((resolve,reject)=>{
+    dbpool.query('call updatePassword(?,?)',[email,hashedPassword],(error,result)=>{
+      if(error){
+        return reject(error);
       }
-      else
-      { 
-          console.log("Data inserted=",result);
-          resolve(result);
+      else{
+        console.log("update pass result=",result);
+        return resolve(result);
       }
-  });
+    });
+
   })
-  
+  console.log("Update password result:",result);
+  return result;
 }
 module.exports = {
   checkUserExists,
