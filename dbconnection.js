@@ -2,7 +2,7 @@ const mysql= require("mysql");
 
 const dbconnection =()=>{
   const dbpool = mysql.createPool({       
-    connectionLimit: 2,
+    connectionLimit: 20,
     host     : process.env.DBHOST,
     user     : process.env.DBUSER,
     password : process.env.DBPASSWORD,
