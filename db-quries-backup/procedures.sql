@@ -1,10 +1,10 @@
 *** Procedure 01 ***
 
 DELIMITER //
-create PROCEDURE addproduct(IN pname varchar(50),IN pprice int(11),IN pdescription text ,IN ppicture longblob)
+create PROCEDURE addProduct(IN pname varchar(50),IN pprice int(11),IN pquantity int(11),IN pdescription text ,IN ppicture longblob)
 BEGIN
-INSERT INTO Employees (FirstName, LastName, Email, HireDate)
-VALUES (pname, pprice, pdescription, ppicture);
+INSERT INTO product (name, price, quantity, description, picture)
+VALUES (pname, pprice, pquantity, pdescription, ppicture);
 END //
 DELIMITER;
 
@@ -46,3 +46,20 @@ BEGIN
 UPDATE user SET password = upassword WHERE email = umail; 
 END //
 DELIMITER;
+
+*** Procedure 06 ***
+
+DELIMITER //
+create PROCEDURE deleteProduct(IN pid int(11))
+BEGIN
+DELETE FROM product WHERE id = pid; 
+END //
+DELIMITER;
+
+*** Update Product ***
+DELIMITER //
+CREATE PROCEDURE updateProduct(IN pid int(11),IN pname varchar(50),IN pprice int(11), IN pquantity int(11),IN pdescription text,IN ppicture longblob)
+BEGIN
+UPDATE product set name=pname, price=pprice, quantity=pquantity, description=pdescription, picture=ppicture where id=pid;
+END //
+DELIMITER ;
