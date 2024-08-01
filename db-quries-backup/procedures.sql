@@ -57,6 +57,7 @@ END //
 DELIMITER;
 
 *** Update Product ***
+
 DELIMITER //
 CREATE PROCEDURE updateProduct(IN pid int(11),IN pname varchar(50),IN pprice int(11), IN pquantity int(11),IN pdescription text,IN ppicture longblob)
 BEGIN

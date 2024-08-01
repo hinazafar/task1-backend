@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/userRoutes');
 const fileUpload = require('express-fileupload');
+const multer = require('multer');
 
 const cors = require("cors");
 const app = express()

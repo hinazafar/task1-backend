@@ -57,7 +57,7 @@ const addProductDB =async(name,price,quantity,description,file)=>{
 }
 //Update Product
 // Function to Add New Product in DB
-const updateProduct =async(name,price,quantity,description,file)=>{
+const updateProduct =async(id,name,price,quantity,description,file)=>{
 
   console.log("length of picture=",file.length);
   return new Promise((resolve,reject)=>{

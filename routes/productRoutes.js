@@ -1,5 +1,5 @@
 const express = require('express');
-const { deleteProduct,allProducts,addProductDB } = require('../model/productModel');
+const { deleteProduct,allProducts,addProductDB,updateProduct } = require('../model/productModel');
 const productRouter = express.Router();
 var fetchuser = require('../middleware/fetchuser');
 
@@ -8,6 +8,7 @@ productRouter.post('/add-product',fetchuser, async (req, res) => {
 
   try{
     const file = req.files.file;
+    //const file = req.file.buffer;
     const { name,price,quantity,description} = req.body;
     if (file === null) {
       return res.status(400).json({ message: 'No file uploaded' });
@@ -16,6 +17,7 @@ productRouter.post('/add-product',fetchuser, async (req, res) => {
     // Insert product details into the database
     console.log("values of name, price,descrptin",name, price,quantity,description,file.name);
     const result = await addProductDB(name,price,quantity,description,file.data);
+    //const result = await addProductDB(name,price,quantity,description,file);
     res.status(200).json({message: 'Product Added Successfuly'});
   }
   catch (error) {
@@ -25,17 +27,18 @@ productRouter.post('/add-product',fetchuser, async (req, res) => {
 });
 // Route to Update Product
 productRouter.post('/update-product',fetchuser, async (req, res) => {
-
   try{
-    const file = req.files.file;
-    const { id,name,price,quantity,description} = req.body;
-    if (file === null) {
+    console.log("file received", req.body.picture);
+    //const file = req.files.file;
+    
+    const { id,name,price,quantity,description,picture} = req.body;
+    if (picture === null) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
-    console.log("file uploaded",file);
+    
     // Insert product details into the database
-    console.log("values of name, price,descrptin",name, price,quantity,description,file.name);
-    const result = await updateProduct(id,name,price,quantity,description,file.data);
+    console.log("values of name, price,descrptin",name, price,quantity,description);
+    const result = await updateProduct(id,name,price,quantity,description,picture);
     res.status(200).json({message: 'Product Updated Successfuly'});
   }
   catch (error) {
