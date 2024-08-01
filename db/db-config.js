@@ -1,4 +1,5 @@
 const mysql= require("mysql"); 
+require("dotenv").config();
 
 const dbconnection =()=>{
   const dbpool = mysql.createPool({       
@@ -7,9 +8,11 @@ const dbconnection =()=>{
     user     : process.env.DBUSER,
     password : process.env.DBPASSWORD,
     database : process.env.DATABASE
+   
   });
   return dbpool;
 }
 
 
 module.exports = dbconnection;
+ 

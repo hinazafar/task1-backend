@@ -1,10 +1,26 @@
-// src/sendEmail.js
+const crypto = require('crypto');
+const mysql= require("mysql");
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
-const generateOTP = require('./otp');
+
 
 // Load environment variables from .env file
 dotenv.config();
+
+function generateOTP() {
+  return new Promise((resolve, reject) => {
+      crypto.randomBytes(3, function(err, buffer) {
+          if (err) {
+              reject(err);
+          } else {
+              const otp = parseInt(buffer.toString('hex'), 16).toString().substr(0, 6);
+              resolve(otp);
+          }
+      });
+  });
+}
+
+
 // Create transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -34,3 +50,9 @@ async function sendOTPEmail(email,otp) {
 }
 
 module.exports = sendOTPEmail;
+
+
+module.exports = {
+  sendOTPEmail,
+  generateOTP
+};
