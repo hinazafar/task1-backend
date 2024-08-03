@@ -1,9 +1,9 @@
 *** Procedure 01 ***
 
 DELIMITER //
-create PROCEDURE addProduct(IN pname varchar(50),IN pprice int(11),IN pquantity int(11),IN pdescription text ,IN ppicture longblob)
+create PROCEDURE addProduct(IN pname varchar(50),IN pprice int(11),IN pquantity int(11),IN pdescription text ,IN ppicture varchar(50))
 BEGIN
-INSERT INTO product (name, price, quantity, description, picture)
+INSERT INTO product (name, price, quantity, description, pictureName)
 VALUES (pname, pprice, pquantity, pdescription, ppicture);
 END //
 DELIMITER;
@@ -59,8 +59,8 @@ DELIMITER;
 *** Update Product ***
 
 DELIMITER //
-CREATE PROCEDURE updateProduct(IN pid int(11),IN pname varchar(50),IN pprice int(11), IN pquantity int(11),IN pdescription text,IN ppicture longblob)
-BEGIN
-UPDATE product set name=pname, price=pprice, quantity=pquantity, description=pdescription, picture=ppicture where id=pid;
+CREATE PROCEDURE updateProduct(IN pid int(11),IN pname varchar(50),IN pprice int(11), IN pquantity int(11),IN pdescription text,IN ppicture varchar(100)) 
+BEGIN 
+UPDATE product set name=pname, price=pprice, quantity=pquantity, description=pdescription, pictureName=ppicture where id=pid; 
 END //
 DELIMITER ;

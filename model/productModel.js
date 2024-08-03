@@ -38,25 +38,25 @@ const deleteProduct = (id) => {
   });
 };
 // Function to Add New Product in DB
-const addProductDB =async(name,price,quantity,description,file)=>{
+const addProductDB =async(name,price,quantity,description,picture)=>{
 
   // const addQuery = "INSERT INTO product (name,price,description,picture) VALUES (?,?,?,?)";
   // this is using db procedure
-  console.log("length of picture=",file.length);
+  console.log("picture name in model =",picture);
   return new Promise((resolve,reject)=>{
-    dbpool.query('call addProduct(?,?,?,?,?)',[name,price,quantity,description,file],(error,result)=>{
+    dbpool.query('call addProduct(?,?,?,?,?)',[name,price,quantity,description,picture],(error,result)=>{
       if(error){
         return reject(error);
       }
       else{
-        console.log("add product result=",result);
+        console.log("add product with picture result=",result);
         return resolve(result);
       }
     });
   })
 }
 //Update Product
-// Function to Add New Product in DB
+// Function to Update Product in DB
 const updateProduct =async(id,name,price,quantity,description,file)=>{
 
   console.log("length of picture=",file.length);
@@ -72,9 +72,25 @@ const updateProduct =async(id,name,price,quantity,description,file)=>{
     });
   })
 }
+//To update product with out picture
+const updateProductWithoutPic =async(id,name,price,quantity,description)=>{
+  return new Promise((resolve,reject)=>{
+    dbpool.query('call updateProductWithoutPicture(?,?,?,?,?)',[id,name,price,quantity,description],(error,result)=>{
+      if(error){
+        return reject(error);
+      }
+      else{
+        console.log("updated product result=",result);
+        return resolve(result);
+      }
+    });
+  })
+}
+
 module.exports = {
   deleteProduct,
   allProducts,
   addProductDB,
-  updateProduct
+  updateProduct,
+  updateProductWithoutPic
 };

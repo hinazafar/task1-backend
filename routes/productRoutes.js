@@ -1,44 +1,71 @@
 const express = require('express');
-const { deleteProduct,allProducts,addProductDB,updateProduct } = require('../model/productModel');
+const multer = require('multer');
+const mysql = require('mysql');
+const path = require('path');
+const fs = require('fs');
+const { deleteProduct,allProducts,updateProduct,updateProductWithoutPic } = require('../model/productModel');
 const productRouter = express.Router();
 var fetchuser = require('../middleware/fetchuser');
+const productController=require('../controller/productController');
 
-// Route to add new Product
-productRouter.post('/add-product',fetchuser, async (req, res) => {
+// Set up multer for file handling
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');                                  
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
 
+// Endpoint to handle image upload and save image path in database
+productRouter.post('/add-product',upload.single('file'),productController.addProduct);
+// productRouter.post('/add-product', fetchuser,upload.single('file'), async(req, res) => {
+//   try{
+//         if (!req.file) {
+//           return res.status(400).json({message: 'Picture not attached'});
+//         }
+//         console.log("File received",req.file.filename);
+//         const imageName = req.file.filename;
+//         const { name,price,quantity,description} = req.body;
+//         console.log("values of name, price,descrptin",name, price,quantity,description,imageName);
+//         const result = await addProductDB(name,price,quantity,description,imageName);
+//         res.status(200).json({message: 'Product Added Successfuly'});
+//       }
+//   catch (error)
+//     {
+//         console.log("error:",error);
+//         res.status(500).json({ message: 'Error adding product'});
+//     }
+// });
+
+productRouter.post('/update-product-without-picture', upload.none(),async (req, res) => {
   try{
-    const file = req.files.file;
-    //const file = req.file.buffer;
-    const { name,price,quantity,description} = req.body;
-    if (file === null) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-    console.log("file uploaded",file);
-    // Insert product details into the database
-    console.log("values of name, price,descrptin",name, price,quantity,description,file.name);
-    const result = await addProductDB(name,price,quantity,description,file.data);
-    //const result = await addProductDB(name,price,quantity,description,file);
-    res.status(200).json({message: 'Product Added Successfuly'});
+    const {id, name,price,quantity,description} = req.body;
+    console.log("values of name, price,descrptin",req.body,name, price,quantity,description);
+    const result = await updateProductWithoutPic(id,name,price,quantity,description);
+    if(result.affectedRows>0)
+      res.status(200).json({message: 'Product Updated Successfuly'});
+    else
+    res.status(404).json({message: 'Product Not Found'});
   }
   catch (error) {
     console.log("error:",error);
     res.status(500).json({ message: 'Error adding product'});
   }
 });
-// Route to Update Product
-productRouter.post('/update-product',fetchuser, async (req, res) => {
+///
+productRouter.post('/update-product',upload.single('file'), async (req, res) => {
   try{
-    console.log("file received", req.body.picture);
-    //const file = req.files.file;
-    
-    const { id,name,price,quantity,description,picture} = req.body;
-    if (picture === null) {
-      return res.status(400).json({ message: 'No file uploaded' });
+    if (!req.file) {
+      return res.status(400).json({message: 'Picture not attached'});
     }
-    
-    // Insert product details into the database
-    console.log("values of name, price,descrptin",name, price,quantity,description);
-    const result = await updateProduct(id,name,price,quantity,description,picture);
+    console.log("File received",req.file.filename);
+    const imageName = req.file.filename;
+    const { id,name,price,quantity,description} = req.body;
+    console.log("values of name, price,descrptin",name, price,quantity,description,imageName);
+    const result = await updateProduct(id,name,price,quantity,description,imageName);
     res.status(200).json({message: 'Product Updated Successfuly'});
   }
   catch (error) {

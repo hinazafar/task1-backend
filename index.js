@@ -9,10 +9,12 @@ const cors = require("cors");
 const app = express()
 const port = 3000
 app.use(cors())
+app.use('/uploads', express.static('uploads'));
+
 
 // Enable files upload
-app.use(fileUpload());
-
+//app.use(fileUpload());
+ 
 //app.use(express.json())
 // Middleware
 app.use(bodyParser.json());
