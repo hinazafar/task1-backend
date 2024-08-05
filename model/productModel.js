@@ -87,10 +87,27 @@ const updateProductWithoutPic =async(id,name,price,quantity,description)=>{
   })
 }
 
+//Place order
+// Place order
+const placeOrderDB =async(id,newQuantity)=>{
+  return new Promise((resolve,reject)=>{
+    dbpool.query('update product set quantity=? where id =?',[newQuantity,id],(error,result)=>{
+      if(error){
+        return reject(error);
+      }
+      else{
+        //console.log("updated product result=",result);
+        return resolve(result);
+      }
+    });
+  })
+}
+
 module.exports = {
   deleteProduct,
   allProducts,
   addProductDB,
   updateProduct,
-  updateProductWithoutPic
+  updateProductWithoutPic,
+  placeOrderDB
 };

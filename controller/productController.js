@@ -1,5 +1,5 @@
 
-const { deleteProduct,allProducts,addProductDB,updateProduct } = require('../model/productModel');
+const { deleteProduct,allProducts,addProductDB,updateProduct,placeOrderDB } = require('../model/productModel');
 
 
 const addProduct=async(req, res) => {
@@ -21,5 +21,25 @@ const addProduct=async(req, res) => {
       }
   }
 
+const placeOrder=async(req,res)=>{
+  try{
+      const { name,phone,address,products} = req.body;
+      console.log("values of name, price,descrptin",name,phone,address,products);
+      for (const product of products) {
+        const newQuantity=product.totalQuantity-product.orderedQuantity;
+        console.log("new quantity=",newQuantity);
+        const result = await placeOrderDB(product.id, newQuantity);
+        console.log(result);  // Log the result of placeOrder
+      }
+        return res.status(200).json({message: 'Order successfully placed'});
+      
+    }
+    catch(error)
+    {
+      console.log("place order error=",error);
+      return res.status(500).json(error);
+    } 
+}
 
-module.exports = {addProduct};
+
+module.exports = {addProduct,placeOrder};

@@ -19,6 +19,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Place order
+productRouter.post('/placeorder',productController.placeOrder);
+
 // Endpoint to handle image upload and save image path in database
 productRouter.post('/add-product',upload.single('file'),productController.addProduct);
 // productRouter.post('/add-product', fetchuser,upload.single('file'), async(req, res) => {
