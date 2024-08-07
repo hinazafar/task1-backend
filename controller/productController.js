@@ -32,7 +32,6 @@ const placeOrder=async(req,res)=>{
         console.log(result);  // Log the result of placeOrder
       }
         return res.status(200).json({message: 'Order successfully placed'});
-      
     }
     catch(error)
     {
